@@ -10,6 +10,17 @@ def Bspline(m, x):
     return b
 
 
+# evaluates the n-th derivative of the B-Spline of order m at point(s) x
+def Bspline_deriv(m, n, x):
+    if n >= m:
+        b = 0
+    elif n == 0:
+        b = Bspline(m, x)
+    else:
+        b = Bspline_deriv(m-1, n-1, x) - Bspline_deriv(m-1, n-1, x-1)
+    return b
+
+
 # returns omega, beta and x for a given index (j,k)
 def get_ombx(j, k, alpha, epsilon):
     omega = np.sign(j) * ((1 + (1 - alpha) * abs(epsilon * j)) ** (1 / (1 - alpha)) - 1)

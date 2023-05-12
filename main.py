@@ -1,16 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from frame_elements import setup_indexSet, evaluate_linear_combination
-from frame_operations import analysis_operator, setup_gramian, frame_algorithm, analysis_operator_sample, setup_gramian2
+from frame_operations import analysis_operator, setup_gramian, frame_algorithm, analysis_operator_sample, \
+    setup_gramian2, setup_gramian3
 from thresholding import nterm
 import time
 
 start = time.time()
-I = [-10, 10]  # interval
-m = 2  # order of the Bspline
+I = [-1, 1]  # interval
+m = 1  # order of the Bspline
 alpha = 0.5
 epsilon = 0.25
-jmin = -1
+jmin = 0
 jmax = 1
 indexSet = setup_indexSet(I, m, jmin, jmax, alpha, epsilon)
 
@@ -29,7 +30,7 @@ c0 = analysis_operator(m, indexSet, f, alpha, epsilon)  # needs f in analytic fo
 
 load = 0  # 1 load pre-computed gramian, 0 calculate (and save) gramian
 if load == 0:
-    gramian = setup_gramian2(m, indexSet, alpha, epsilon) # setup_gramian or setup_gramian2
+    gramian = setup_gramian3(m, indexSet, alpha, epsilon)  # setup_gramian or setup_gramian2
     np.save('gramian.npy', gramian)
 else:
     gramian = np.load('gramian.npy')
@@ -51,3 +52,7 @@ print('L2-error = ', L2error)
 
 end = time.time()
 print(end - start, 's')
+print(gramian)
+#print(np.max(gramian))
+#print(np.unravel_index(gramian.argmax(), gramian.shape))
+#print(gramian[0][8])
