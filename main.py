@@ -7,7 +7,7 @@ from thresholding import nterm
 import time
 
 start = time.time()
-I = [-1, 1]  # interval
+I = [-10, 10]  # interval
 m = 1  # order of the Bspline
 alpha = 0.5
 epsilon = 0.25
@@ -19,14 +19,15 @@ indexSet = setup_indexSet(I, m, jmin, jmax, alpha, epsilon)
 def f(x):
     #return np.sin(np.pi * x)
     return np.sin(np.pi * x) + 10 * (2 * x * x * (x < 1/2) + 2 * (1-x) ** 2 * (x >= 1/2)) * (x >= 0) * (x <= 1)
+    #return -np.sin(3*np.pi * x) + 10 * (2 * x * x * (x < 1 / 2) + 2 * (1 - x) ** 2 * (x >= 1 / 2)) * (x >= 0) * (x <= 1)
 
 
 h = 0.001
 t = np.arange(I[0], I[1] + h, h)
 samples = f(t)
 
-c0 = analysis_operator(m, indexSet, f, alpha, epsilon)  # needs f in analytic form
-#c0 = analysis_operator_sample(m, indexSet, samples, t, alpha, epsilon)  # f as samples
+#c0 = analysis_operator(m, indexSet, f, alpha, epsilon)  # needs f in analytic form
+c0 = analysis_operator_sample(m, indexSet, samples, t, alpha, epsilon)  # f as samples
 
 load = 0  # 1 load pre-computed gramian, 0 calculate (and save) gramian
 if load == 0:
@@ -35,15 +36,15 @@ if load == 0:
 else:
     gramian = np.load('gramian.npy')
 
-relax = 0.1
-iters = 10 ** 5
-coeffs = frame_algorithm(relax, iters, c0, gramian)
+#relax = 0.1
+#iters = 10 ** 5
+#coeffs = frame_algorithm(relax, iters, c0, gramian)
 
-y = evaluate_linear_combination(m, coeffs, indexSet, t, alpha, epsilon)
-plt.plot(t, y, t, f(t))
-plt.show()
-L2error = np.sqrt(np.trapz(abs(y - f(t)) ** 2, t))
-print('L2-error = ', L2error)
+#y = evaluate_linear_combination(m, coeffs, indexSet, t, alpha, epsilon)
+#plt.plot(t, y, t, f(t))
+#plt.show()
+#L2error = np.sqrt(np.trapz(abs(y - f(t)) ** 2, t))
+#print('L2-error = ', L2error)
 
 #nsteps = 20  # stepsize for the n-term approximation
 #err, dof = nterm(coeffs, nsteps, m, indexSet, alpha, epsilon, t, samples)
@@ -52,7 +53,11 @@ print('L2-error = ', L2error)
 
 end = time.time()
 print(end - start, 's')
-print(gramian)
-#print(np.max(gramian))
-#print(np.unravel_index(gramian.argmax(), gramian.shape))
-#print(gramian[0][8])
+#print(np.linalg.norm(gramian.dot(coeffs)-c0))
+#print(gramian)
+gramian2 = setup_gramian2(m, indexSet, alpha, epsilon)
+print(np.linalg.norm(gramian - gramian2))
+diff = abs(gramian - gramian2)
+print(np.unravel_index(np.argmax(diff), diff.shape))
+print(diff[2][84])
+

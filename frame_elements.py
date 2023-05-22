@@ -9,13 +9,19 @@ def Bspline(m, x):
         b = (x * Bspline(m - 1, x) + (m - x) * Bspline(m - 1, x - 1)) / (m - 1)
     return b
 
+def Bspline_mod(m, x):
+    if m == 1:
+        b = 1 * (x >= 0) * (x <= 1)
+    else:
+        b = (x * Bspline(m - 1, x) + (m - x) * Bspline(m - 1, x - 1)) / (m - 1)
+    return b
 
 # evaluates the n-th derivative of the B-Spline of order m at point(s) x
 def Bspline_deriv(m, n, x):
     if n >= m:
         b = 0
     elif n == 0:
-        b = Bspline(m, x)
+        b = Bspline_mod(m, x)
     else:
         b = Bspline_deriv(m-1, n-1, x) - Bspline_deriv(m-1, n-1, x-1)
     return b

@@ -55,7 +55,7 @@ def setup_gramian(m, indexSet, alpha, epsilon):
         for n in range(r, indexsetlen):
             j2 = indexSet[n][0]
             k2 = indexSet[n][1]
-            ssupp2 = singsupp(j1, k1, m, alpha, epsilon)
+            ssupp2 = singsupp(j2, k2, m, alpha, epsilon)
 
             # find the boundary of the intersection
             boundleft = max(ssupp1[0], ssupp2[0])
@@ -110,7 +110,7 @@ def setup_gramian2(m, indexSet, alpha, epsilon):
             j2 = indexSet[n][0]
             k2 = indexSet[n][1]
             omega2, beta2, x2 = get_ombx(j2, k2, alpha, epsilon)
-            ssupp2 = singsupp(j1, k1, m, alpha, epsilon)
+            ssupp2 = singsupp(j2, k2, m, alpha, epsilon)
 
             # find the boundary of the intersection
             boundleft = max(ssupp1[0], ssupp2[0])
@@ -158,7 +158,7 @@ def setup_gramian3(m, indexSet, alpha, epsilon):
             j2 = indexSet[n][0]
             k2 = indexSet[n][1]
             omega2, beta2, x2 = get_ombx(j2, k2, alpha, epsilon)
-            ssupp2 = singsupp(j1, k1, m, alpha, epsilon)
+            ssupp2 = singsupp(j2, k2, m, alpha, epsilon)
 
             # find the boundary of the intersection
             boundleft = max(ssupp1[0], ssupp2[0])
@@ -171,26 +171,40 @@ def setup_gramian3(m, indexSet, alpha, epsilon):
                 ssupint = ssupint[ssupint <= boundright]
                 ssupint = np.sort(np.unique(ssupint))
 
-                for counter in range(len(ssupint) - 1):  # sum over all intervals
-                    left = ssupint[counter]
-                    right = ssupint[counter + 1]
-                    val = 0
-                    if omega1 == omega2:
-                        def integrand1(t):
-                            return Bspline(m, (t - x1) / beta1) * Bspline(m, (t - x2) / beta2)
+                val = 0
+                if omega1 == omega2:
+                    def integrand(t):
+                        return Bspline(m, (t - x1) / beta1) * Bspline(m, (t - x2) / beta2)
 
-                        val = quad(integrand1, left, right)[0]
-                    else:
-                        for a in range(2 * m + 1):  # integration by parts
-                            factor = (-1j / (2 * np.pi * (omega1 - omega2))) ** (a + 1)
-                            valleft, valright = 0, 0
-                            for k in range(a + 1):  # leibniz rule
-                                eps = np.finfo(float).eps  # this solution is not ideal!
-                                #eps = 0
-                                valleft += math.comb(a, k) * Bspline_deriv(m, a - k, (left + eps - x1) / beta1) * Bspline_deriv(m, k, (left + eps - x2) / beta2)
-                                valright += math.comb(a, k) * Bspline_deriv(m, a - k, (right - eps - x1) / beta1) * Bspline_deriv(m, k, (right - eps - x2) / beta2)
-                            val += factor * (np.exp(2 * np.pi * 1j * (omega1 - omega2) * right) * valright - np.exp(2 * np.pi * 1j * (omega1 - omega2) * left) * valleft)
-                    gramian[n][r] += (beta1 * beta2) ** (-1 / 2) * np.exp(2 * np.pi * 1j * (omega2 * x2 - omega1 * x1)) * val
+                    for counter in range(len(ssupint) - 1):
+                        val += quad(integrand, ssupint[counter], ssupint[counter + 1])[0]
+                else:
+                    if r == 2 and n == 84:
+                        print('lambda', j1, k1,  omega1, beta1, x1)
+                        print('mu', j2, k2, omega2, beta2, x2)
+                        print('supp lambda = ', ssupp1)
+                        print('supp mu = ', ssupp2)
+                        print('sing supp = ', ssupint)
+                    val = 0
+                    eps = np.finfo(float).eps
+                    for counter in range(len(ssupint) - 1):
+                        for k in range(2 * m - 1):
+                            left, right = 0, 0
+                            t1, t2 = ssupint[counter], ssupint[counter+1]
+                            for ell in range(k+1):
+                                fac = math.comb(k, ell) * beta1 ** (-(k - ell)) * beta2 ** (- ell)
+                                left += fac * Bspline_deriv(m, k - ell, (t1 - x1)/beta1 + eps) * Bspline_deriv(m, ell, (t1-x2)/beta2 + eps)
+                                right += fac * Bspline_deriv(m, k - ell, (t2 - x1) / beta1 - eps) * Bspline_deriv(m, ell, (t2 - x2) / beta2 - eps)
+                                if r == 2 and n == 84:
+                                    print((t2 - x1) / beta1, (t1-x2)/beta2)
+                                    print((t2 - x1) / beta1, (t2 - x2) / beta2)
+                                    print('left', left)
+                                    print('right', right)
+                            left *= np.exp(2 * np.pi * 1j * t1 * (omega1 - omega2))
+                            right *= np.exp(2 * np.pi * 1j * t2 * (omega1 - omega2))
+                            val += (-1) ** k * (right - left) * (2 * np.pi * 1j * (omega1 - omega2)) ** (-(k + 1))
+
+                gramian[n][r] = val * (beta1 * beta2) ** (-1 / 2) * np.exp(2 * np.pi * 1j * (-omega1 * x1 + omega2 * x2))
                 gramian[r][n] = np.conj(gramian[n][r])  # use that the gramian is hermitian
     return gramian
 
