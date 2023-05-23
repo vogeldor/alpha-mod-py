@@ -169,7 +169,7 @@ def setup_gramian3(m, indexSet, alpha, epsilon):
                 ssupint = np.hstack((ssupp1, ssupp2))
                 ssupint = ssupint[ssupint >= boundleft]
                 ssupint = ssupint[ssupint <= boundright]
-                ssupint = np.sort(np.unique(ssupint))
+                ssupint = np.sort(np.unique(np.round(ssupint,14)))
 
                 val = 0
                 if omega1 == omega2:
@@ -179,27 +179,36 @@ def setup_gramian3(m, indexSet, alpha, epsilon):
                     for counter in range(len(ssupint) - 1):
                         val += quad(integrand, ssupint[counter], ssupint[counter + 1])[0]
                 else:
-                    if r == 2 and n == 84:
+                    if r == 3 and n == 94:
                         print('lambda', j1, k1,  omega1, beta1, x1)
                         print('mu', j2, k2, omega2, beta2, x2)
                         print('supp lambda = ', ssupp1)
                         print('supp mu = ', ssupp2)
                         print('sing supp = ', ssupint)
                     val = 0
-                    eps = np.finfo(float).eps
+                    #eps = np.finfo(float).eps
                     for counter in range(len(ssupint) - 1):
                         for k in range(2 * m - 1):
                             left, right = 0, 0
                             t1, t2 = ssupint[counter], ssupint[counter+1]
                             for ell in range(k+1):
                                 fac = math.comb(k, ell) * beta1 ** (-(k - ell)) * beta2 ** (- ell)
-                                left += fac * Bspline_deriv(m, k - ell, (t1 - x1)/beta1 + eps) * Bspline_deriv(m, ell, (t1-x2)/beta2 + eps)
-                                right += fac * Bspline_deriv(m, k - ell, (t2 - x1) / beta1 - eps) * Bspline_deriv(m, ell, (t2 - x2) / beta2 - eps)
-                                if r == 2 and n == 84:
-                                    print((t2 - x1) / beta1, (t1-x2)/beta2)
-                                    print((t2 - x1) / beta1, (t2 - x2) / beta2)
-                                    print('left', left)
-                                    print('right', right)
+                                left += fac * Bspline_deriv(m, k - ell, t1/beta1 - epsilon * k1, 0) * Bspline_deriv(m, ell, t1/beta2 - epsilon * k2, 0)
+                                right += fac * Bspline_deriv(m, k - ell, t2/beta1 - epsilon * k1, 1) * Bspline_deriv(m, ell, t2/beta2 - epsilon * k2, 1)
+                                if r == 3 and n == 94:
+                                    print('[', t1, ',', t2, ']')
+                                    print('k - ell = ', k-ell, 'ell = ', ell)
+                                    print('eval1 =', t1 / beta1 - epsilon * k1, t1 / beta2 - epsilon * k2)
+                                    #print(fac * Bspline_deriv(m, k - ell, t1 / beta1 - epsilon * k1, 0) * Bspline_deriv(m,ell,t1 / beta2 - epsilon * k2,0))
+                                    #print(fac)
+                                    print('val1 =', Bspline_deriv(m, k - ell, t1 / beta1 - epsilon * k1, 0), Bspline_deriv(m,ell,t1 / beta2 - epsilon * k2,0))
+                                    print('eval2 =', t2 / beta1 - epsilon * k1, t2 / beta2 - epsilon * k2)
+                                    print('val2 =', Bspline_deriv(m, k - ell, t2 / beta1 - epsilon * k1, 1), Bspline_deriv(m, ell,
+                                                                                                            t2 / beta2 - epsilon * k2,
+                                                                                                            1))
+                                    print(fac * Bspline_deriv(m, k - ell, t2/beta1 - epsilon * k1, 1) * Bspline_deriv(m, ell, t2/beta2 - epsilon * k2, 1))
+                                    #print('left', left)
+                                    #print('right', right)
                             left *= np.exp(2 * np.pi * 1j * t1 * (omega1 - omega2))
                             right *= np.exp(2 * np.pi * 1j * t2 * (omega1 - omega2))
                             val += (-1) ** k * (right - left) * (2 * np.pi * 1j * (omega1 - omega2)) ** (-(k + 1))

@@ -8,8 +8,8 @@ import time
 
 start = time.time()
 I = [-10, 10]  # interval
-m = 1  # order of the Bspline
-alpha = 0.5
+m = 1 # order of the Bspline
+alpha = 0.0
 epsilon = 0.25
 jmin = 0
 jmax = 1
@@ -59,5 +59,5 @@ gramian2 = setup_gramian2(m, indexSet, alpha, epsilon)
 print(np.linalg.norm(gramian - gramian2))
 diff = abs(gramian - gramian2)
 print(np.unravel_index(np.argmax(diff), diff.shape))
-print(diff[2][84])
+#print(diff[1][88])
 
