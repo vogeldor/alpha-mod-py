@@ -8,11 +8,11 @@ import time
 
 start = time.time()
 I = [-10, 10]  # interval
-m = 1 # order of the Bspline
-alpha = 0.0
+m = 3 # order of the Bspline
+alpha = 0.5
 epsilon = 0.25
-jmin = 0
-jmax = 1
+jmin = -2
+jmax = 2
 indexSet = setup_indexSet(I, m, jmin, jmax, alpha, epsilon)
 
 
@@ -29,20 +29,21 @@ samples = f(t)
 #c0 = analysis_operator(m, indexSet, f, alpha, epsilon)  # needs f in analytic form
 c0 = analysis_operator_sample(m, indexSet, samples, t, alpha, epsilon)  # f as samples
 
-load = 0  # 1 load pre-computed gramian, 0 calculate (and save) gramian
+load = 1  # 1 load pre-computed gramian, 0 calculate (and save) gramian
+
 if load == 0:
     gramian = setup_gramian3(m, indexSet, alpha, epsilon)  # setup_gramian or setup_gramian2
     np.save('gramian.npy', gramian)
 else:
     gramian = np.load('gramian.npy')
 
-#relax = 0.1
-#iters = 10 ** 5
-#coeffs = frame_algorithm(relax, iters, c0, gramian)
+relax = 0.1
+iters = 10 ** 5
+coeffs = frame_algorithm(relax, iters, c0, gramian)
 
-#y = evaluate_linear_combination(m, coeffs, indexSet, t, alpha, epsilon)
-#plt.plot(t, y, t, f(t))
-#plt.show()
+y = evaluate_linear_combination(m, coeffs, indexSet, t, alpha, epsilon)
+plt.plot(t, y, t, f(t))
+plt.show()
 #L2error = np.sqrt(np.trapz(abs(y - f(t)) ** 2, t))
 #print('L2-error = ', L2error)
 
@@ -55,9 +56,9 @@ end = time.time()
 print(end - start, 's')
 #print(np.linalg.norm(gramian.dot(coeffs)-c0))
 #print(gramian)
-gramian2 = setup_gramian2(m, indexSet, alpha, epsilon)
-print(np.linalg.norm(gramian - gramian2))
-diff = abs(gramian - gramian2)
-print(np.unravel_index(np.argmax(diff), diff.shape))
-#print(diff[1][88])
+#gramian2 = setup_gramian2(m, indexSet, alpha, epsilon)
+#print(np.linalg.norm(gramian - gramian2))
+#diff = abs(gramian - gramian2)
+#print(np.unravel_index(np.argmax(diff), diff.shape))
+#print(diff[108][296])
 

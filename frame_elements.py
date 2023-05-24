@@ -27,25 +27,26 @@ def Bspline_deriv(m, n, x, dir):
         b = 0
     elif n == 0:
         if m == 1:
-            if -tol < x <= 1 and dir == 0:
+            if -tol < x < 1 - tol and dir == 0:
                 return 1
-            elif 0 <= x <= 1 + tol and dir == 1:
+            elif tol < x < 1 + tol and dir == 1:
                 return 1
             else:
                 return 0
         else:
             b = Bspline(m, x)
-    elif n == m-1:
-        if (abs(x-1) < tol) and dir == 0:
-            return -1
-        elif (abs(x-1) < tol) and dir == 1:
-            return 1
-        elif -tol <= x < 0 and dir == 0:
-            return 1
-        elif 2+tol >= x > 2 and dir == 1:
-            return -1
-        else:
-            return 1 * (x >= 0) * (x < 1) - 1 * (x > 1) * (x <= 2)
+    elif n == m-1 == 1:
+        #if (abs(x-1) < tol) and dir == 0:
+        #    return -1
+        #elif (abs(x-1) < tol) and dir == 1:
+        #    return 1
+        #elif -tol <= x < 0 and dir == 0:
+        #    return 1
+        #elif 2+tol >= x > 2 and dir == 1:
+        #    return -1
+        #else:
+        #    return 1 * (x >= 0) * (x < 1) - 1 * (x > 1) * (x <= 2)
+        return Bspline_deriv(m-1, n-1, x, dir) - Bspline_deriv(m-1, n-1, x-1, dir)
     else:
         b = Bspline_deriv(m-1, n-1, x, dir) - Bspline_deriv(m-1, n-1, x-1, dir)
     return b

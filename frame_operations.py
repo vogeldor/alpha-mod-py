@@ -169,7 +169,7 @@ def setup_gramian3(m, indexSet, alpha, epsilon):
                 ssupint = np.hstack((ssupp1, ssupp2))
                 ssupint = ssupint[ssupint >= boundleft]
                 ssupint = ssupint[ssupint <= boundright]
-                ssupint = np.sort(np.unique(np.round(ssupint,14)))
+                ssupint = np.sort(np.unique(np.round(ssupint,12)))
 
                 val = 0
                 if omega1 == omega2:
@@ -178,8 +178,9 @@ def setup_gramian3(m, indexSet, alpha, epsilon):
 
                     for counter in range(len(ssupint) - 1):
                         val += quad(integrand, ssupint[counter], ssupint[counter + 1])[0]
+
                 else:
-                    if r == 3 and n == 94:
+                    if r == 1054 and n == 1241:
                         print('lambda', j1, k1,  omega1, beta1, x1)
                         print('mu', j2, k2, omega2, beta2, x2)
                         print('supp lambda = ', ssupp1)
@@ -195,7 +196,7 @@ def setup_gramian3(m, indexSet, alpha, epsilon):
                                 fac = math.comb(k, ell) * beta1 ** (-(k - ell)) * beta2 ** (- ell)
                                 left += fac * Bspline_deriv(m, k - ell, t1/beta1 - epsilon * k1, 0) * Bspline_deriv(m, ell, t1/beta2 - epsilon * k2, 0)
                                 right += fac * Bspline_deriv(m, k - ell, t2/beta1 - epsilon * k1, 1) * Bspline_deriv(m, ell, t2/beta2 - epsilon * k2, 1)
-                                if r == 3 and n == 94:
+                                if r == 1054 and n == 1241:
                                     print('[', t1, ',', t2, ']')
                                     print('k - ell = ', k-ell, 'ell = ', ell)
                                     print('eval1 =', t1 / beta1 - epsilon * k1, t1 / beta2 - epsilon * k2)
@@ -206,7 +207,8 @@ def setup_gramian3(m, indexSet, alpha, epsilon):
                                     print('val2 =', Bspline_deriv(m, k - ell, t2 / beta1 - epsilon * k1, 1), Bspline_deriv(m, ell,
                                                                                                             t2 / beta2 - epsilon * k2,
                                                                                                             1))
-                                    print(fac * Bspline_deriv(m, k - ell, t2/beta1 - epsilon * k1, 1) * Bspline_deriv(m, ell, t2/beta2 - epsilon * k2, 1))
+                                    #print(fac * Bspline_deriv(m, k - ell, t2/beta1 - epsilon * k1, 1) * Bspline_deriv(m, ell, t2/beta2 - epsilon * k2, 1))
+                                    #print('r-l = ', right - left)
                                     #print('left', left)
                                     #print('right', right)
                             left *= np.exp(2 * np.pi * 1j * t1 * (omega1 - omega2))
