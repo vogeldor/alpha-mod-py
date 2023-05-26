@@ -10,15 +10,6 @@ def Bspline(m, x):
     return b
 
 
-def Bspline_deriv2(m, n, x):
-    if n >= m:
-        return 0
-    elif m == 1:
-        return 1 * (x >= 0) * (x <= 1)
-    else:
-        return Bspline_deriv2(m-1, n-1, x) - Bspline_deriv2(m-1, n-1, x-1)
-
-
 # evaluates the n-th derivative of the B-Spline of order m at point(s) x
 # dir is only relevant for the derivate of m = 2. 0 means t -> x from above. 1 means t -> x from below.
 def Bspline_deriv(m, n, x, dir):
@@ -35,18 +26,6 @@ def Bspline_deriv(m, n, x, dir):
                 return 0
         else:
             b = Bspline(m, x)
-    elif n == m-1 == 1:
-        #if (abs(x-1) < tol) and dir == 0:
-        #    return -1
-        #elif (abs(x-1) < tol) and dir == 1:
-        #    return 1
-        #elif -tol <= x < 0 and dir == 0:
-        #    return 1
-        #elif 2+tol >= x > 2 and dir == 1:
-        #    return -1
-        #else:
-        #    return 1 * (x >= 0) * (x < 1) - 1 * (x > 1) * (x <= 2)
-        return Bspline_deriv(m-1, n-1, x, dir) - Bspline_deriv(m-1, n-1, x-1, dir)
     else:
         b = Bspline_deriv(m-1, n-1, x, dir) - Bspline_deriv(m-1, n-1, x-1, dir)
     return b
