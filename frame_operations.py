@@ -32,6 +32,9 @@ def analysis_operator(m, indexSet, f, alpha, epsilon):
 def analysis_operator_sample(m, indexSet, f, t, alpha, epsilon):
     result = np.zeros(len(indexSet), dtype=complex)
     for n in range(len(indexSet)):
+        if np.mod(n, 1000) == 0:
+            print(n, '/', indexSet[-1][2])
+
         j = indexSet[n][0]
         k = indexSet[n][1]
 
@@ -148,5 +151,7 @@ def setup_gramian3(m, indexSet, alpha, epsilon):
 def frame_algorithm(relax, iters, c0, gramian):
     c = relax * c0
     for n in range(iters - 1):
-        c = c + relax * (c0 - gramian.dot(c))
+        step = c0 - gramian.dot(c)
+        c = c + relax * step
+        print(n, np.linalg.norm(step))
     return c

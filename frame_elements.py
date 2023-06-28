@@ -81,3 +81,20 @@ def setup_indexSet(I, m, jmin, jmax, alpha, epsilon):
             indexSet.append([j, k, number])
             number += 1
     return indexSet
+
+
+# create a matrix that represents the finite index set \Lambda \subset \mathbb{Z} x \mathbb{Z}.
+# each row represents one index of the form [j, k, number]. number is for convenience.
+def setup_indexSet_step(I, m, J, alpha, epsilon):
+    a, b = I[0], I[1]
+    indexSet = []
+    number = 1
+    for j in J:
+        omega = np.sign(j) * ((1 + (1 - alpha) * abs(epsilon * j)) ** (1 / (1 - alpha)) - 1)
+        beta = (1 + abs(omega)) ** (-alpha)
+        kmin = int(np.floor(1 / epsilon * (1 / beta * a - m)) + 1)
+        kmax = int(np.ceil(1 / (epsilon * beta) * b) - 1)
+        for k in range(kmin, kmax+1):
+            indexSet.append([j, k, number])
+            number += 1
+    return indexSet

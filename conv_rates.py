@@ -64,8 +64,6 @@ sparse.save_npz('gramian_j60_a05.npz', gramian2)
 #gramian2 = sparse.load_npz('gramian_j60_a05.npz')
 
 
-
-
 # run frame algorithm
 relax = 0.1
 iters = 5 * 10 ** 4
@@ -79,19 +77,8 @@ np.save('coeffs_m3_a05_e25_j60_sinparab5.npy', coeffs2)
 #coeffs2 = np.load('coeffs_m3_a05_e25_j30_sinspikes.npy')
 
 
-narray = np.zeros(2*int(np.log(len(indexSet1)))+1, dtype=int)
-for N in range(2*int(np.log(len(indexSet1)))):
-    narray[N] = int(np.exp(0.5*(N+1)))
-narray[2*int(np.log(len(indexSet1)))] = len(indexSet1)
-
-err1, dof1 = nterm(coeffs1, narray, m, indexSet1, alpha1, epsilon, t, samples)
-
-narray = np.ones(2*int(np.log(len(indexSet2)))+1, dtype=int)
-for N in range(2*int(np.log(len(indexSet2)))):
-    narray[N] = int(np.exp(0.5*(N+1)))
-narray[2*int(np.log(len(indexSet2)))] = len(indexSet2)
-
-err2, dof2 = nterm(coeffs2, narray, m, indexSet2, alpha2, epsilon, t, samples)
+err1, dof1 = nterm(coeffs1, m, indexSet1, alpha1, epsilon, t, samples)
+err2, dof2 = nterm(coeffs2, m, indexSet2, alpha2, epsilon, t, samples)
 
 
 plt.plot(np.log(dof1), np.log(err1), label='alpha = 0')

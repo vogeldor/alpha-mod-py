@@ -8,10 +8,10 @@ import time
 start = time.time()
 I = [-10, 10]
 m = 3
-alpha = 0
+alpha = 0.0
 epsilon = 0.25
-jmin = -30
-jmax = 30
+jmin = -1
+jmax = 1
 indexSet = setup_indexSet(I, m, jmin, jmax, alpha, epsilon)
 
 def f(t):
@@ -36,15 +36,12 @@ t = np.arange(I[0], I[1] + h, h)
 samples = signal(t)
 
 #c0 = analysis_operator(m, indexSet, f, alpha, epsilon)  # needs f in analytic form
-#c0 = analysis_operator_sample(m, indexSet, samples, t, alpha, epsilon)  # f as samples
+c0 = analysis_operator_sample(m, indexSet, samples, t, alpha, epsilon)  # f as samples
 
-load = 0  # 1 load pre-computed gramian, 0 calculate (and save) gramian
 
-if load == 0:
-    gramian = setup_gramian3(m, indexSet, alpha, epsilon)
-    sparse.save_npz('gramian2.npz', gramian)
-else:
-    gramian = sparse.load_npz('gramian2.npz')
+gramian = setup_gramian3(m, indexSet, alpha, epsilon)
+#sparse.save_npz('gramian2.npz', gramian)
+#gramian = sparse.load_npz('gramian2.npz')
 
 relax = 0.1
 iters = 10 ** 5

@@ -10,8 +10,14 @@ def thresholding(coeffs, mu):
 
 
 # n-term approximation
-def nterm(coeffs, narray, m, indexSet, alpha, epsilon, t, samples):
+def nterm(coeffs, m, indexSet, alpha, epsilon, t, samples):
     coeffs_sorted = sorted(coeffs, key=abs, reverse=True)
+
+    narray = np.zeros(2 * int(np.log(len(indexSet))) + 1, dtype=int)
+    for N in range(2 * int(np.log(len(indexSet)))):
+        narray[N] = int(np.exp(0.5 * (N + 1)))
+    narray[2 * int(np.log(len(indexSet)))] = len(indexSet)
+
     L2error, dof = np.zeros(len(narray)), np.zeros(len(narray))
 
     k = 0
